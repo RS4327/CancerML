@@ -2,6 +2,7 @@ numpy
 pandas
 matplotlib
 tensorflow
+scikit-learn
 dvc
 seaborn
 nltk

@@ -4,7 +4,7 @@ import yaml
 import json
 import joblib
 from pathlib import Path
-from ensure import ensure_annotations
+#from ensure import ensure_annotations
 from box import Box
 from box.exceptions import BoxValueError
 from CancerML import logger
@@ -22,7 +22,7 @@ class ConfigBox(Box):
 
 
 # ------------------- FIXED YAML READER -------------------
-@ensure_annotations
+#@ensure_annotations
 def Read_Yaml(path_to_yaml: Path) -> ConfigBox:
     try:
         with open(path_to_yaml, "r", encoding="utf-8-sig") as yaml_file:
@@ -43,7 +43,7 @@ def Read_Yaml(path_to_yaml: Path) -> ConfigBox:
 
 
 # ------------------- DIRECTORY CREATION -------------------
-@ensure_annotations
+#@ensure_annotations
 def create_directories(paths: list, verbose=True):
     for path in paths:
         os.makedirs(path, exist_ok=True)
@@ -52,7 +52,7 @@ def create_directories(paths: list, verbose=True):
 
 
 # ------------------ FILE SIZE CHECK ------------------
-@ensure_annotations
+#@ensure_annotations
 def get_size(path: Path) -> str:
     size_kb = round(os.path.getsize(path) / 1024)
     return f"~{size_kb} KB"

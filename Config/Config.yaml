@@ -20,3 +20,10 @@ data_validation:
   STATUS_FILE: artifacts/data_validation/validation_status.txt
   ALL_REQUIRED_FILES:
     - cancer_dataset.csv
+data_preprocessing:
+  root_dir: artifacts/data_preprocessing
+  data_load_path: artifacts/data_ingestion/cancer_dataset.csv
+  local_data_path: artifacts/data_preprocessing/data_preprocessing.csv
+  status_file: artifacts/data_preprocessing/preprocessing_status.txt
+  all_required_files: 
+    - cancer_dataset.csv

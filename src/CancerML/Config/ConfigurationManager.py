@@ -4,6 +4,7 @@ from CancerML.Entity.Config_Entity import DataIngestionConfig
 from CancerML.Entity.Config_Entity import DataValidationConfig
 from CancerML.Entity.Config_Entity import DataPreProcessingConfig
 from pathlib import Path
+from CancerML.Entity.Config_Entity import DataModelingConfig
 
 
 class ConfigurationManager:
@@ -52,5 +53,17 @@ class ConfigurationManager:
         )
         return Data_PreProcessing_Config
 
+    def get_data_modeling_config(self)->DataModelingConfig:
+        config=self.config.data_modeling
+        create_directories([config.root_dir])
+            
+        Data_Model_Config=DataModelingConfig(
+            root_dir=config.root_dir,
+            data_load_path=config.data_load_path,
+            local_data_path=config.local_data_path,
+            status_file=config.status_file,
+            all_required_files=config.all_required_files
 
+        )
+        return Data_Model_Config
 

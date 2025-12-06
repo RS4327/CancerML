@@ -31,3 +31,4 @@ class DataModelingConfig:
     local_data_path:Path
     status_file:Path
     all_required_files:list
+

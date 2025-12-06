@@ -24,3 +24,10 @@ class DataPreProcessingConfig:
     status_file:Path
     all_required_files:list
 
+@dataclass
+class DataModelingConfig:
+    root_dir:Path
+    data_load_path:Path
+    local_data_path:Path
+    status_file:Path
+    all_required_files:list

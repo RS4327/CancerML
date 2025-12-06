@@ -27,3 +27,12 @@ data_preprocessing:
   status_file: artifacts/data_preprocessing/preprocessing_status.txt
   all_required_files: 
     - cancer_dataset.csv
+
+
+data_modeling:
+  root_dir: artifacts/data_modeling
+  data_load_path: artifacts/data_preprocessing/data_preprocessing.csv
+  local_data_path: artifacts/data_modeling/data_modeling.csv
+  status_file: artifacts/data_modeling/model_staus.csv
+  all_required_files:
+    - data_preprocessing.csv

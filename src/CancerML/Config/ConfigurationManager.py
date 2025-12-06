@@ -2,6 +2,7 @@ from CancerML.Constants import *
 from CancerML.Utils.common import * 
 from CancerML.Entity.Config_Entity import DataIngestionConfig
 from CancerML.Entity.Config_Entity import DataValidationConfig
+from CancerML.Entity.Config_Entity import DataPreProcessingConfig
 from pathlib import Path
 
 
@@ -37,6 +38,19 @@ class ConfigurationManager:
             ALL_REQUIRED_FILES=config.ALL_REQUIRED_FILES 
         )
         return data_validation_config
+    def Get_DataPreProcesing_Config(self)->DataPreProcessingConfig:
+        config=self.config.data_preprocessing
+
+        create_directories([config.root_dir])
+        Data_PreProcessing_Config=DataPreProcessingConfig(
+            root_dir=config.root_dir,
+            data_load_path=config.data_load_path,
+            local_data_path=config.local_data_path,
+            status_file=config.status_file,
+            all_required_files=config.all_required_files
+
+        )
+        return Data_PreProcessing_Config
 
 
 

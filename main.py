@@ -1,6 +1,7 @@
 from CancerML import logger
 from CancerML.Pipeline.stage_01_data_ingestion import  DataIngestionPipeLine
 from CancerML.Pipeline.stage_02_data_validation import DataValidationPipeline
+from CancerML.Pipeline.stage_03_data_preprocessing import DataPreProcessingPipeline
 
 Stage_Name ='Data Ingestion'
 
@@ -20,6 +21,17 @@ Stage_Name ="Data Validation"
 try :
     logger.info(f">>>>>>>>>> Stage : {Stage_Name} Started <<<<<<<<<<")
     obj=DataValidationPipeline()
+    obj.main()
+    logger.info(f">>>>>>>>>> Stage : {Stage_Name} Completed Successfully <<<<<<<<<<")
+except Exception as e:
+    logger.info(e)
+    raise e
+
+Stage_Name=" Data PreProcessing"
+
+try :
+    logger.info(f">>>>>>>>>> Stage : {Stage_Name} Started <<<<<<<<<<")
+    obj=DataPreProcessingPipeline()
     obj.main()
     logger.info(f">>>>>>>>>> Stage : {Stage_Name} Completed Successfully <<<<<<<<<<")
 except Exception as e:

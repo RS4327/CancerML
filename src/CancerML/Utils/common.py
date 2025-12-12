@@ -8,6 +8,8 @@ from pathlib import Path
 from box import Box
 from box.exceptions import BoxValueError
 from CancerML import logger
+import dill
+import joblib
 
 
 # Safer path change (optional)
@@ -56,3 +58,13 @@ def create_directories(paths: list, verbose=True):
 def get_size(path: Path) -> str:
     size_kb = round(os.path.getsize(path) / 1024)
     return f"~{size_kb} KB"
+
+
+def load_object(file_path):
+
+    try:
+        with open(file_path,'rb') as file_obj:
+            return joblib.load(file_obj)
+
+    except Exception as e:
+        raise e

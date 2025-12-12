@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prostate Cancer — Predict</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #d3cce3, #e9e4f0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 24px 28px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      width: 420px;
+      max-width: 96%;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #1b2d6b;
+      margin: 0 0 12px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      padding: 10px;
+      border: 1px solid #cfcfe6;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .help {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      background-color: #1b2d6b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #16244f;
+    }
+
+    .header-box {
+      background-color: #eaf2ff;
+      border: 1px solid #cfe3ff;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .header-box h2 {
+      color: #0d47a1;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #555;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* modal / overlay styles (result) */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; right:0; bottom:0;
+      background-color: rgba(0,0,0,0.55);
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .custom-alert {
+      background-color: #fff;
+      color: #111;
+      padding: 22px 26px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+      font-size: 16px;
+      max-width: 520px;
+      width: calc(100% - 40px);
+    }
+    .custom-alert .ok-btn {
+      margin-top: 14px;
+      padding: 10px 18px;
+      background-color: #1b2d6b;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .custom-alert pre {
+      text-align: left;
+      max-height: 300px;
+      overflow: auto;
+      background: #f7f7fb;
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 12px;
+    }
+
+    @media (max-width:480px) {
+      input[type="number"], select { font-size: 13px; }
+      .form-container { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <form action="{{ url_for('predict_datapoint') }}" method="post" id="predictForm">
+      <div class="header-box">
+        <h2>Prostate Cancer — Single Prediction</h2>
+        <div style="font-size:13px;color:#444;">Fill numeric values (use decimals where appropriate)</div>
+      </div>
+
+      <!-- lcavol -->
+      <div class="form-group">
+        <label for="lcavol">lcavol (log cancer volume)</label>
+        <input step="0.0001" type="number" id="lcavol" name="lcavol" placeholder="e.g. 0.5" required />
+        <div class="help">Continuous — use the measured value or model-ready transformed value.</div>
+      </div>
+
+      <!-- lweight -->
+      <div class="form-group">
+        <label for="lweight">lweight (log prostate weight)</label>
+        <input step="0.0001" type="number" id="lweight" name="lweight" placeholder="e.g. 2.1" required />
+      </div>
+
+      <!-- age -->
+      <div class="form-group">
+        <label for="age">age (years)</label>
+        <input step="1" type="number" id="age" name="age" placeholder="e.g. 65" min="0" max="120" required />
+      </div>
+
+      <!-- lbph -->
+      <div class="form-group">
+        <label for="lbph">lbph (log of benign prostatic hyperplasia)</label>
+        <input step="0.0001" type="number" id="lbph" name="lbph" placeholder="e.g. 0.12" required />
+      </div>
+
+      <!-- svi -->
+      <div class="form-group">
+        <label for="svi">svi (seminal vesicle invasion)</label>
+        <select id="svi" name="svi" required>
+          <option value="" disabled selected>Select svi</option>
+          <option value="0">0 — absent</option>
+          <option value="1">1 — present</option>
+        </select>
+        <div class="help">Binary: 0 or 1</div>
+      </div>
+
+      <!-- lcp -->
+      <div class="form-group">
+        <label for="lcp">lcp (log of capsular penetration)</label>
+        <input step="0.0001" type="number" id="lcp" name="lcp" placeholder="e.g. 1.2" required />
+      </div>
+
+      <!-- gleason -->
+      <div class="form-group">
+        <label for="gleason">gleason (Gleason score)</label>
+        <input step="1" type="number" id="gleason" name="gleason" placeholder="e.g. 7" min="0" max="12" required />
+        <div class="help">Integer score — typical range 2–10 (use dataset-specific range)</div>
+      </div>
+
+      <!-- pgg45 -->
+      <div class="form-group">
+        <label for="pgg45">pgg45 (percent of Gleason scores 4 or 5)</label>
+        <input step="0.1" type="number" id="pgg45" name="pgg45" placeholder="e.g. 30" min="0" max="100" required />
+        <div class="help">Percentage (0–100)</div>
+      </div>
+
+      <!-- lpsa
+      <div class="form-group">
+        <label for="lpsa">lpsa (log prostate specific antigen)</label>
+        <input step="0.0001" type="number" id="lpsa" name="lpsa" placeholder="e.g. 2.3" required />
+      </div> -->
+
+      <!-- train -->
+      <div class="form-group">
+        <label for="train">train (flag / mode)</label>
+        <select id="train" name="train" required>
+          <option value="" disabled selected>Select train flag</option>
+          <option value="1">True</option>
+          <option value="0">False</option>
+          <!-- <option value="true">true — run model in training mode</option>
+          <option value="false">false — prediction only</option> -->
+        </select>
+        <div class="help">If your backend uses this flag to trigger training vs predict, choose appropriately. Otherwise select 'false'.</div>
+      </div>
+
+      <div style="text-align:center;">
+        <button type="submit">Run Prediction</button>
+      </div>
+    </form>
+
+    <!-- results modal (Jinja: shown when 'results' provided by backend) -->
+    {% if results is defined and results is not none %}
+    <div class="overlay" id="popupAlert">
+      <div class="custom-alert">
+        <div style="font-size:18px; font-weight:700; color:#d32f2f;">
+          Prediction Result
+        </div>
+
+        <!-- Show readable result text + full JSON -->
+        <div style="margin-top:10px; color:#111;">
+          {{ results.summary if results.summary is defined else '' }}
+        </div>
+
+        <pre>{{ results | tojson(indent=2) }}</pre>
+
+        <button class="ok-btn" onclick="closeAlert()">OK</button>
+      </div>
+    </div>
+
+    <script>
+      function closeAlert() {
+        var el = document.getElementById("popupAlert");
+        if (el) el.style.display = "none";
+      }
+    </script>
+    {% endif %}
+
+  </div>
+
+</body>
+</html>

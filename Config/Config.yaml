@@ -3,6 +3,7 @@ artifacts_root: artifacts
 data_ingestion:
   root_dir: artifacts/data_ingestion
   source_url: "https://raw.githubusercontent.com/RS4327/RAWDATA/main/cancer_dataset.csv"
+  #source_url: "https://raw.githubusercontent.com/RS4327/RAWDATA/main/new_cancer_dataset.csv"
   local_data_file: artifacts/data_ingestion/cancer_dataset.csv
 
 # data_validation:
@@ -33,6 +34,19 @@ data_modeling:
   root_dir: artifacts/data_modeling
   data_load_path: artifacts/data_preprocessing/data_preprocessing.csv
   local_data_path: artifacts/data_modeling/data_modeling.csv
-  status_file: artifacts/data_modeling/model_staus.csv
+  status_file: artifacts/data_modeling/model_staus.txt
   all_required_files:
     - data_preprocessing.csv
+
+data_drift:
+  root_dir: artifacts/data_drift
+  old_data_path: artifacts/data_preprocessing/data_preprocessing.csv
+  new_data_source_url: "https://raw.githubusercontent.com/RS4327/RAWDATA/main/new_cancer_dataset.csv"
+  status_file: artifacts/data_drift/drift_status.txt
+  all_required_files: ['new_cancer_dataset.csv','data_preprocessing.csv']
+  load_old_model_path: artifacts/data_modeling/old_prostate_model.pkl
+  load_old_scaler_path: artifacts/data_modeling/old_scaler.pkl
+  
+
+
+  

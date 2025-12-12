@@ -6,6 +6,10 @@ from pathlib import Path
 from CancerML import logger
 import seaborn as sns
 import matplotlib.pyplot as plt
+import joblib
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.model_selection import train_test_split
 
 
 class DataPreProcessing:
@@ -89,8 +93,14 @@ class DataPreProcessing:
             sns.heatmap(df.corr(),annot=True,cmap='coolwarm')
 
             logger.info(f"---- Saving the preprocessind data into csv ")
-            df.to_csv(self.config.local_data_path, index=False)
+            df.to_csv(self.config.local_data_path, index=False) 
             
+            
+           
+            
+            
+            #scaler_path = save_dir / "old_scaler.pkl"
+            #joblib.dump(model, model_path)
 
         else:
             logger.info(f"Data set does not exist in the source path : please check")

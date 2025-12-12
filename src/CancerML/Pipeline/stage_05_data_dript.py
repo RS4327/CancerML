@@ -1,11 +1,11 @@
 from CancerML.Config.ConfigurationManager import ConfigurationManager
-from CancerML.Components.Data_modeling import DataModeling
+from CancerML.Components.Data_Drift import DataDrift
 from CancerML import logger
-from CancerML.Entity.Config_Entity import DataModelingConfig
+from CancerML.Entity.Config_Entity import DataDriftConfig
 
-Stage_Name='Data Modeling'
+Stage_Name='Data Drift'
 
-class DataModelingPipeline:
+class DataDriftPipeline:
         def __init__(self):
              pass    
         
@@ -14,13 +14,9 @@ class DataModelingPipeline:
 
             try:
                 config=ConfigurationManager()
-                #data_ingestion=config.get_data_modeling_config()
-                data_model=config.get_data_modeling_config()
-
-                DataModel=DataModeling(config=data_model)
-                Model=DataModel.Train_Model()
-                
-                
+                data_drift=config.get_data_drift()
+                validation=DataDrift(config=data_drift)
+                validation=validation.data_validation()
             except Exception as e:
                 raise e
 
@@ -28,7 +24,7 @@ class DataModelingPipeline:
 if __name__=="__main__":
     try :
         logger.info(f">>>>>>>>>> Stage : {Stage_Name} Started <<<<<<<<<<")
-        obj=DataModelingPipeline()
+        obj=DataDriftPipeline()
         obj.main()
         logger.info(f">>>>>>>>>> Stage : {Stage_Name} Completed Successfully <<<<<<<<<<")
     except Exception as e:

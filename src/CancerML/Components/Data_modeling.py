@@ -1,74 +1,79 @@
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import r2_score,mean_squared_error
-from sklearn.linear_model import Ridge
-from sklearn.linear_model import Lasso
+from sklearn.metrics import r2_score, mean_squared_error
 import joblib
-from CancerML import logger
 from pathlib import Path
-from CancerML.Entity.Config_Entity import DataModelingConfig
 import pandas as pd
-import numpy as np
+from CancerML import logger
+from CancerML.Entity.Config_Entity import DataModelingConfig
 
 
 class DataModeling:
-    def __init__(self,config=DataModelingConfig):
-        self.config=config
+    def __init__(self, config: DataModelingConfig):
+        self.config = config
+
     def Train_Model(self):
-        file =Path(self.config.data_load_path)
-        if file.name in self.config.all_required_files:
-            validation_status=True
-            with open(self.config.status_file,'w') as f:
-                f.write(f"Validation Status : {validation_status}")
-            
-            logger.info(f" \n -------- Encoding the Categorical Features -------- ")
-            df=pd.read_csv(file)
-            df['train']=df['train'].astype(int)
-            print(df.head(1))
-            logger.info(f"\n ---------- Spliting the Data set into Train and Test ----------  \n")
 
-            x=df.drop(columns='lpsa')
-            y=df['lpsa']
-            logger.info(f"--------- Scalling Data set ---------")
-            scaler=StandardScaler()
-            X=scaler.fit_transform(x)
-            x_train,x_test,y_train,y_test=train_test_split(X,y,test_size=.2,random_state=11)
-            
+        file = Path(self.config.data_load_path)
 
-            model=LinearRegression()
-            model.fit(x_train,y_train)
-            pred=model.predict(x_test)
+        # Validate file exists
+        if file.name not in self.config.all_required_files:
+            logger.info("There is no CSV file in the source path.")
+            return
 
-            logger.info(f" Old Model R2-Score :{r2_score(y_test,pred)}")
-            logger.info(f" Old Model MSE      :{mean_squared_error(y_test,pred)}")
+        with open(self.config.status_file, 'w') as f:
+            f.write("Validation Status : True")
 
-            logger.info(f" ---------Ridge Regression -------")
-            rmodel=Ridge(alpha=0.01)
-            rmodel.fit(x_train,y_train)
-            rpred=rmodel.predict(x_test)
-            logger.info(f" Ridge Old Model R2-Score :{r2_score(y_test,rpred)}")
-            logger.info(f" Ridge Old Model MSE      :{mean_squared_error(y_test,rpred)}")
+        logger.info("Reading dataset...")
+        df = pd.read_csv(file)
 
+        # Ensure train column is numeric
+        df["train"] = df["train"].astype(int)
 
-            logger.info(f"---------- Lasso Regression -----------")
-            lmodel=Lasso(alpha=0.01)
-            lmodel.fit(x_train,y_train)
-            lpred=lmodel.predict(x_test)
-            logger.info(f" Lasso Old Model R2-Score :{r2_score(y_test,lpred)}")
-            logger.info(f" Lasso Old Model MSE      :{mean_squared_error(y_test,lpred)}")
+        # Split features & target
+        X = df.drop(columns="lpsa")
+        y = df["lpsa"]
 
-            logger.info(f" ----- MODEL DEPLOYMENT (SAVE MODEL) ---- ")
-            full_path=Path(self.config.local_data_path)
-            save_dir = full_path.parent
-            model_path = save_dir / "old_prostate_model.pkl"
-            scaler_path = save_dir / "old_scaler.pkl"
-            joblib.dump(model, model_path)
-            joblib.dump(scaler, scaler_path)
-            
+        # Preprocessing
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
 
-            print("MODEL DEPLOYED SUCCESSFULLY")
+        x_train, x_test, y_train, y_test = train_test_split(
+            X_scaled, y, test_size=0.2, random_state=11
+        )
 
-        else:
-            logger.info(f"There is no csv file exist in source path")
-    
+        # Save preprocessor
+        save_dir = Path(self.config.local_data_path).parent
+        preprocessor_path = save_dir / "preprocessor.pkl"
+        joblib.dump(scaler, preprocessor_path)
+        logger.info(f"Saved preprocessor at: {preprocessor_path}")
+
+        # Train Linear Regression
+        model = LinearRegression()
+        model.fit(x_train, y_train)
+        pred = model.predict(x_test)
+
+        logger.info(f"Linear Regression R2 Score: {r2_score(y_test, pred)}")
+        logger.info(f"Linear Regression MSE:      {mean_squared_error(y_test, pred)}")
+
+        # Ridge
+        rmodel = Ridge(alpha=0.01)
+        rmodel.fit(x_train, y_train)
+        rpred = rmodel.predict(x_test)
+        logger.info(f"Ridge R2 Score: {r2_score(y_test, rpred)}")
+        logger.info(f"Ridge MSE:      {mean_squared_error(y_test, rpred)}")
+
+        # Lasso
+        lmodel = Lasso(alpha=0.01)
+        lmodel.fit(x_train, y_train)
+        lpred = lmodel.predict(x_test)
+        logger.info(f"Lasso R2 Score: {r2_score(y_test, lpred)}")
+        logger.info(f"Lasso MSE:      {mean_squared_error(y_test, lpred)}")
+
+        # Save final model
+        model_path = save_dir / "final_model.pkl"
+        joblib.dump(model, model_path)
+        logger.info(f"Saved final model at: {model_path}")
+
+        print("MODEL DEPLOYED SUCCESSFULLY")

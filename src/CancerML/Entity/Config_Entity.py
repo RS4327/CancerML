@@ -32,3 +32,13 @@ class DataModelingConfig:
     status_file:Path
     all_required_files:list
 
+@dataclass
+class DataDriftConfig:
+    root_dir: Path
+    old_data_path: Path
+    new_data_source_url: Path
+    status_file:Path
+    all_required_files:list
+    load_old_model_path: Path
+    load_old_scaler_path: Path
+    

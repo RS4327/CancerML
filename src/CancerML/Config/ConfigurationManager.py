@@ -5,6 +5,7 @@ from CancerML.Entity.Config_Entity import DataValidationConfig
 from CancerML.Entity.Config_Entity import DataPreProcessingConfig
 from pathlib import Path
 from CancerML.Entity.Config_Entity import DataModelingConfig
+from CancerML.Entity.Config_Entity import DataDriftConfig
 
 
 class ConfigurationManager:
@@ -67,3 +68,18 @@ class ConfigurationManager:
         )
         return Data_Model_Config
 
+
+    def get_data_drift(self)->DataDriftConfig:
+        config=self.config.data_drift
+        
+        create_directories([config.root_dir])
+        get_data_dript_config=DataDriftConfig(
+            root_dir=config.root_dir,
+            old_data_path=config.old_data_path,
+            new_data_source_url=config.new_data_source_url,
+            status_file=config.status_file,
+            all_required_files=config.all_required_files,
+            load_old_model_path=config.load_old_model_path,
+            load_old_scaler_path=config.load_old_scaler_path
+        )
+        return get_data_dript_config
